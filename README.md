@@ -11,6 +11,12 @@ Goal: able to see when I am at la cheraille and when i have pre-existing books o
 * Integrate with google calendar
   * Click through to google calendar (or show whole day below)
 
+TODOs:
+
+* Data import
+* Legend with codes
+* Showing ? or X for occupied, color for location ...
+
 ## User stories
 
 As Rufus I want to know what time i'm at La Cheraille with nothing specific booked
