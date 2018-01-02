@@ -109,8 +109,8 @@ function draw(chartData, startDate, endDate, selector='.container') {
   }
 }
 
-var startDate = moment.utc('2017-01-01');
-var endDate = moment.utc('2018-01-01');
+var startDate = moment.utc('2018-01-01');
+var endDate = moment.utc('2019-01-01');
 var chartData = {};
 d3.utcDays(startDate, endDate).map(function (dateElement) {
   dateElement = moment.utc(dateElement);
@@ -124,7 +124,7 @@ d3.utcDays(startDate, endDate).map(function (dateElement) {
     title: ''
   };
 });
-d3.csv('events.csv', function(error, csv) {
+d3.csv('events-2018-rufus.csv', function(error, csv) {
   if (error) throw error;
 
   for(let row of csv) {
