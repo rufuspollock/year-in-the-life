@@ -1,0 +1,13 @@
+{
+  "name": "calendar-viz",
+  "dependencies": {
+    "ics-to-json": ""
+  },
+  "devDependencies": {
+    "mocha": ""
+  },
+  "scripts": {
+    "test": "mocha"
+  }
+}
+
