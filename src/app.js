@@ -1,53 +1,23 @@
-var startDate = moment.utc('2018-01-01');
-var endDate = moment.utc('2019-01-01');
+var startDate = '2019-01-01';
+var endDate = '2020-01-01';
 
-d3.csv('data/events-2018-rufus.csv', function(error, csv) {
-  if (error) throw error;
-  var chartData = processCsvRows(csv);
-  draw(chartData, startDate, endDate);
-})
+var icalUrl = 'https://calendar.google.com/calendar/ical/artearthtech.com_r63nmilujsalhfgcq2bj2j3vmc%40group.calendar.google.com/private-a2ad4dd990cdf0598860a29f0b603e46/basic.ics'
 
-d3.csv('data/events-2018-sylvie.csv', function(error, csv) {
-  if (error) throw error;
-  var chartData = processCsvRows(csv);
-  draw(chartData, startDate, endDate);
-})
+document.addEventListener("DOMContentLoaded", function(event) {
+  var tmpUrl = 'https://cors.io/?' + icalUrl;
+  // var tmpUrl = '/src/me/calendar/data/events-both.ics';
+  axios.get(tmpUrl, { crossdomain: true })
+    .then(function (response) {
+      renderIt(response.data);
+    });
+});
 
-// process csv rows to add colors etc based on location, activity etc
-function processCsvRows(csv) {
-  var chartData = {};
-  d3.utcDays(startDate, endDate).map(function (dateElement) {
-    dateElement = moment.utc(dateElement);
-    var color = '#d9d9d9';
-    // sundays are reserved
-    if (dateElement.isoWeekday() == 7) {
-      color = 'pink'
-    }
-    chartData[moment(dateElement).toISOString().slice(0,10)] = {
-      color: color,
-      title: ''
-    };
-  });
-
-  for(let row of csv) {
-    var day = moment.utc(row.start);
-    while(day <= moment.utc(row.end) && row.end) {
-      if (row.status.includes('?')) {
-        row.color = 'orange';
-      } else if (row.where.includes('lacheraille')) {
-        row.color = 'blue';
-      } else if (row.what.includes('holiday')) {
-        row.color = 'violet';
-      } else if (row.what.includes('personal sprint')) {
-        row.color = 'red';
-      } else {
-        row.color = 'rgb(73, 153, 151)';
-      }
-      row.title = `${row.where} - ${row.what} ${row.status}`;
-      chartData[day.toISOString().slice(0,10)] = row;
-      day = day.add(1, 'day')
-    }
+function renderIt(icalData) {
+  var calendarData = module.extract(icalData);
+  for (let person of ['rufus', 'sylvie']) {
+    var tmpData = module.filterCalendarData(calendarData, person);
+    var chartData = module.convertCalendarToHeatmapData(startDate, endDate, tmpData);
+    draw(chartData, startDate, endDate);
   }
-  return chartData;
 }
 

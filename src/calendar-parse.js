@@ -1,5 +1,6 @@
 // var ical = require('../vendor/ical.js')
-var icsToJson = require('ics-to-json').default;
+const icsToJson = require('ics-to-json').default;
+const moment = require('moment');
 
 // convert 20180708 to 2017-07-08
 function dateWithDashes(inDate) {
@@ -22,17 +23,20 @@ function extract(calendarString) {
   return results;
 }
 
-// Working at ABC ~rufus #work @london
-// Also allow for ~ rufus
+// Parse a calendar title/summary string into structured data
+//
+// Strings are like: "Working at ABC ~rufus #work @london"
+// Also allow for spaces after ~ e.g. "~ rufus"
 function parseDescription(string) {
   var tmp = string.replace('~ ', '~');
 
   var result = {
     raw: string,
     what: '',
-    location: '',
+    where: '',
     hashtag: '',
-    who: ''
+    who: '',
+    status: ''
   };
 
   var whoRegex = new RegExp('~([^~ ]+) ?');
@@ -42,18 +46,18 @@ function parseDescription(string) {
   }
 
 
-  var locationRegex = new RegExp('@([^@ ]+)');
-  var m2 = tmp.match(locationRegex);
+  var whereRegex = new RegExp('@([^@ ]+)');
+  var m2 = tmp.match(whereRegex);
   if (m2) {
     // St Tropez is @st-tropez
-    result.location= m2[1].replace('-', ' ');
+    result.where= m2[1].replace('-', ' ');
   }
 
-  var locationRegex = new RegExp('@([^@ ]+)');
-  var m2 = tmp.match(locationRegex);
+  var whereRegex = new RegExp('@([^@ ]+)');
+  var m2 = tmp.match(whereRegex);
   if (m2) {
     // St Tropez is @st-tropez
-    result.location= m2[1].replace('-', ' ');
+    result.where= m2[1].replace('-', ' ');
   }
 
   // TODO: could be multiple hashtags??
@@ -64,7 +68,7 @@ function parseDescription(string) {
   }
 
   var what = tmp.replace(whoRegex, '')
-    .replace(locationRegex, '')
+    .replace(whereRegex, '')
     .replace(hashRegex, '')
     .trim()
     ;
@@ -74,8 +78,83 @@ function parseDescription(string) {
   return result;
 }
 
+// Deep clone then filter ...
+const filterCalendarData = function(calData, who) {
+  var out = calData.map(evt => {
+    return Object.assign({}, evt);
+  });
+  var out = out.filter(evt => {
+    mywho = ('' || evt.who).toLowerCase();
+    return (!who || mywho == 'both' || mywho == who);
+  });
+  return out;
+}
+
+function isoDate(date) {
+  return date.toISOString().slice(0,10);
+}
+
+// calendar heatmap data
+// a dict indexed by date
+// { date: { color: ..., title: ... } }
+// dates are ISO format strings ...
+function convertCalendarToHeatmapData(startDate, endDate, calendarData) {
+  var chartData = {};
+  dateRange(startDate, endDate).map(function (dateElement) {
+    var color = '#d9d9d9';
+    // sundays are reserved
+    if (dateElement.isoWeekday() == 7) {
+      color = 'pink'
+    }
+    chartData[isoDate(dateElement)] = {
+      color: color,
+      title: ''
+    };
+  });
+
+  function rowColor(row) {
+    if (row.status && row.status.includes('?')) {
+      row.color = 'orange';
+    } else if (row.where && row.where.includes('lacheraille')) {
+      row.color = 'blue';
+    } else if (row.what.includes('holiday')) {
+      row.color = 'violet';
+    } else if (row.what.includes('personal sprint')) {
+      row.color = 'red';
+    } else {
+      row.color = 'rgb(73, 153, 151)';
+    }
+  }
+
+  for(let row of calendarData) {
+    rowColor(row);
+    row.title = `${row.raw}`;
+    dateRange(row.start, row.end).forEach(day => {
+      chartData[isoDate(day)] = row;
+    });
+  }
+  return chartData;
+}
+
+// Get list of dates between two dates
+// TODO: what should happen if start and end are the same
+function dateRange(startDate, endDate) {
+  var dateArr = [];
+  var start = moment.utc(startDate);
+  var end = endDate ? moment.utc(endDate) : moment.utc(start).add(1, 'd');
+
+  while(start < end){
+    dateArr.push(moment.utc(start));
+    start = start.add(1, 'days');
+  }
+  return dateArr;
+}
+
 module.exports = {
   extract: extract,
-  parseDescription: parseDescription
+  parseDescription: parseDescription,
+  convertCalendarToHeatmapData: convertCalendarToHeatmapData,
+  dateRange: dateRange,
+  filterCalendarData: filterCalendarData
 }
 

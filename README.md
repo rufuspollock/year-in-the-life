@@ -1,4 +1,14 @@
-# Plan
+Visualize your year calendar on its own or alongside others and find patterns.
+
+# Development
+
+To build some stuff you need browserify:
+
+```
+browserify src/calendar-parse.js --standalone module -o src/bundle.js
+```
+
+# Design
 
 Goal: able to see when I am at la cheraille and when i have pre-existing books or commitments for the rest of the year (converse: when i have gaps)
 
@@ -17,13 +27,34 @@ TODOs:
 * Legend with codes
 * Showing ? or X for occupied, color for location ...
 
+## Data Model
+
+```
+start       start date
+end         end date
+where       location
+what        description of what i am doing
+category    e.g. vacation, lm, personal etc
+status      ?? confirmed or not confirmed
+```
+
 ## User stories
+
+### What time is booked / available
+
+As Rufus I want to know what times i am definitively booked and busy so that I can plan around that
+
+As Rufus I want to know what times I can book out for sprints so that I reserve that time
+
+As Rufus I want to know what times I and Sylvie are both free so that we can schedule work together
+
+As Rufus I want to know what times I am definitely in a particular location but not schedudled so that I can book activities there
 
 As Rufus I want to know what time i'm at La Cheraille with nothing specific booked
 
 As Rufus I want to know when I'm committed at Landmark so that I know what times are immovable and can't be booked for other stuff
 
-As Rufus I want to know what times I can book out for sprints so that I reserve that time
+### High level
 
 As Rufus I want to plan out my year powerfully so that I can act with integrity and clearly do stuff
 
@@ -80,3 +111,4 @@ where(day) {
 * https://github.com/DKirwan/calendar-heatmap - github style, popular
 * https://github.com/g1eb/calendar-heatmap - most sophisticated (probably a bit much for me)
 * Swim lane chart - http://bl.ocks.org/bunkat/1962173
+

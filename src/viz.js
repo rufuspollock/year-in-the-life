@@ -13,7 +13,9 @@ var locale = {
 };
 
 function draw(chartData, startDate, endDate, selector='.container') {
-  var startDate = moment.utc(startDate);
+  var startDate = moment.utc(startDate)
+    endDate = moment.utc(endDate)
+    ;
 
   // 52 weeks ...
   var cellSize = config.cellInnerSize + config.cellPadding;
