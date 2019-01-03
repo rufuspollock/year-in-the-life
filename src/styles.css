@@ -1,5 +1,6 @@
 .calendar-heatmap {
-  padding: 36px;
+  padding: 3px;
+  display: block;
 }
 
 text.month-name,

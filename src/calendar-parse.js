@@ -96,41 +96,26 @@ function isoDate(date) {
 
 // calendar heatmap data
 // a dict indexed by date
-// { date: { color: ..., title: ... } }
+// { date: { color: ..., title: ..., other event data if present ...} }
 // dates are ISO format strings ...
-function convertCalendarToHeatmapData(startDate, endDate, calendarData) {
+function convertCalendarToHeatmapData(calendarData, startDate, endDate) {
+  // create full date range and assign default structure
   var chartData = {};
-  dateRange(startDate, endDate).map(function (dateElement) {
-    var color = '#d9d9d9';
-    // sundays are reserved
-    if (dateElement.isoWeekday() == 7) {
-      color = 'pink'
-    }
+  dateRange(startDate, endDate).forEach(dateElement => {
     chartData[isoDate(dateElement)] = {
-      color: color,
-      title: ''
+      color: 'white',
+      title: '',
+      date: isoDate(dateElement)
     };
   });
 
-  function rowColor(row) {
-    if (row.status && row.status.includes('?')) {
-      row.color = 'orange';
-    } else if (row.where && row.where.includes('lacheraille')) {
-      row.color = 'blue';
-    } else if (row.what.includes('holiday')) {
-      row.color = 'violet';
-    } else if (row.what.includes('personal sprint')) {
-      row.color = 'red';
-    } else {
-      row.color = 'rgb(73, 153, 151)';
-    }
-  }
-
+  // now set with event data we have ...
+  var start = moment.utc(startDate);
   for(let row of calendarData) {
-    rowColor(row);
-    row.title = `${row.raw}`;
     dateRange(row.start, row.end).forEach(day => {
-      chartData[isoDate(day)] = row;
+      if (day >= start) {
+        chartData[isoDate(day)] = Object.assign({ color: 'white', title: ''}, row);
+      }
     });
   }
   return chartData;

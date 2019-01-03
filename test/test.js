@@ -78,9 +78,9 @@ describe('Make heatmap data', function() {
         status: ''
       }
     ]
-    var out = extractor.convertCalendarToHeatmapData('2018-01-01', '2019-01-01', inData);
+    var out = extractor.convertCalendarToHeatmapData(inData, '2018-01-01', '2019-01-01');
     assert.equal(Object.keys(out).length, 365);
-    assert.equal(out['2018-02-04'].title, 'lisbon - On holiday ');
+    assert.equal(out['2018-02-04'].what, 'On holiday');
   });
 });
 
