@@ -4700,7 +4700,7 @@ const filterCalendarData = function(calData, who) {
   });
   var out = out.filter(evt => {
     mywho = ('' || evt.who).toLowerCase();
-    return (!who || mywho == 'both' || mywho == who);
+    return (!mywho || mywho == 'both' || mywho == who);
   });
   return out;
 }

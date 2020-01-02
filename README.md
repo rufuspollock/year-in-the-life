@@ -8,6 +8,12 @@ To build some stuff you need browserify:
 browserify src/calendar-parse.js --standalone module -o src/bundle.js
 ```
 
+# Use
+
+Install a CORS enabling extension for your browser and enable it to use this app.
+
+Why? This needs CORs and there is no reliable CORS proxy anymore as of 2020.
+
 # Design
 
 Goal: able to see when I am at la cheraille and when i have pre-existing books or commitments for the rest of the year (converse: when i have gaps)
